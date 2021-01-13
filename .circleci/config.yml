@@ -35,13 +35,13 @@ jobs:
 
 
   test:
-    docker:
-        - image: circleci/python:latest
-            environment:
-                CONDUIT_SECRET: 'something-really-secret'
-                FLASK_APP: /path/to/autoapp.py
-                FLASK_DEBUG: 1
-                TEST_DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
+    docker: 
+      - image: circleci/python:latest
+        environment:
+          CONDUIT_SECRET: 'something-really-secret'
+          FLASK_APP: /path/to/autoapp.py
+          FLASK_DEBUG: 1
+          TEST_DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
       
       - image: circleci/postgres:9.6.5-alpine-ram
         auth:
