@@ -19,18 +19,68 @@ jobs:
           
     steps:
       - checkout
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
       - run:
           name: Install Python deps in a venv
           command: |
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements/dev.txt
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+          paths:
+            - "venv"
 
 
 
+  test:
+    docker:
+        - image: circleci/python:latest
+        environment:
+            CONDUIT_SECRET = 'something-really-secret'
+            FLASK_APP = /path/to/autoapp.py
+            FLASK_DEBUG = 1
+            
+          TEST_DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
       
+      - image: circleci/postgres:9.6.5-alpine-ram
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_DB: circle_test
+          POSTGRES_PASSWORD: ""
+          
+    steps:
+        - checkout
+        - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+        - run:
+          name: Tests Flask
+          command: |
+            . venv/bin/activate
+            flask db stamp head
+            flask db migrate
+            flask db upgrade
+            flask test
+        - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+          paths:
+            - "venv"
+
+
+
+
+
+
+          
 workflows:
   version: 2
   build-deploy:
     jobs:
       - build
+      - test:
+        requires:
+            - build
