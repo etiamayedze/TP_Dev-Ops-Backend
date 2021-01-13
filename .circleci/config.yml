@@ -56,8 +56,9 @@ jobs:
     steps:
       - checkout
       - run: 
-        name: heroku deploy
-        command: 
+          name: heroku deploy
+          command: |
+            git push https://heroku:02467a97-3871-4afd-95ab-2b1a1c190165@git.heroku.com/warm-fortress-97103.git HEAD:main
 
           
 workflows:
