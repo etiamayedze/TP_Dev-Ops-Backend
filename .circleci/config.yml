@@ -37,6 +37,9 @@ jobs:
       - checkout
       - restore_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+      - run:
+          name: wait for postgres
+          command: dockerize -wait tcp://localhost -timeout 1m
       
       - run:
           name: Tests Flask
