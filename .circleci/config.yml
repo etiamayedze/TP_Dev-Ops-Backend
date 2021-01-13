@@ -19,7 +19,6 @@ jobs:
             - "venv"
 
 
-
   test:
     docker:
       - image: circleci/python:latest
@@ -49,10 +48,16 @@ jobs:
             flask db migrate
             flask db upgrade
             flask test
-
-
-
-
+            
+            
+  deploy:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - run: 
+        name: heroku deploy
+        command: 
 
           
 workflows:
@@ -63,3 +68,7 @@ workflows:
       - test:
           requires:
             - build
+      - deploy:
+          requires:
+            - build
+            
