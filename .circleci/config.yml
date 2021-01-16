@@ -76,7 +76,7 @@ jobs:
       - deploy:
           name: Publish application to docker hub
           command: |
-            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p 'DOCKERPASSWORD'
             docker tag app $DOCKER_HUB_USER_ID/my-python-app:$CIRCLE_BUILD_NUM
             docker tag app $DOCKER_HUB_USER_ID/my-python-app:latest
             docker push $DOCKER_HUB_USER_ID/my-python-app:$CIRCLE_BUILD_NUM
@@ -95,5 +95,7 @@ workflows:
       - deploy:
           requires:
             - build
-      - docker-build-and-push
+      - docker-build-and-push:
+          context:
+            - DOCKER 
             
