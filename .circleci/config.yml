@@ -22,10 +22,9 @@ jobs:
             FLASK_DEBUG: 1
   
       - save_cache:
-          key:
-            - v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
           paths:
             - venv
+          key: v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
 
 
   test:
@@ -83,8 +82,7 @@ jobs:
           POSTGRES_PORT: 5432
           
       - save_cache:
-          key:
-            - v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
+          key: v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
           paths:
             - venv
           
