@@ -43,9 +43,9 @@ jobs:
             - v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
             - v3-dependencies-
 
-      - run:
-          name: wait for postgres
-          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+#      - run:
+#          name: wait for postgres
+#          command: dockerize -wait tcp://localhost:5432 -timeout 1m
       
       - run:
           name: flask upgrade
