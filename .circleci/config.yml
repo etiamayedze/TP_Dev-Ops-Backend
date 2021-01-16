@@ -134,11 +134,8 @@ workflows:
             - build
       - deploy:
           requires:
-            - build
-#      - docker-build-and-push:
-#          context:
-#            - docker 
+            - build 
       - docker-build-and-push
-            requires:
-                - build
+          requires:
+            - build
             
