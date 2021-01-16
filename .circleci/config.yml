@@ -43,9 +43,9 @@ jobs:
             - v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
             - v3-dependencies-
 
-#      - run:
-#          name: wait for postgres
-#          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: wait for postgres
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
       
       - run:
           name: flask upgrade
@@ -53,15 +53,15 @@ jobs:
             . venv/bin/activate
             sleep 1
             flask db upgrade
-        environment:
-          CONDUIT_SECRET: 'something-really-secret'
-          FLASK_APP: /home/circleci/repo/autoapp.py
-          DATABASE_URL: postgresql://myUser:somePwd@localhost:5432/mydb
-          FLASK_DEBUG: 1
-          POSTGRES_USER: myUser
-          POSTGRES_DB: mydb
-          POSTGRES_PASSWORD: somePwd
-          POSTGRES_PORT: 5432
+          environment:
+            CONDUIT_SECRET: 'something-really-secret'
+            FLASK_APP: /home/circleci/repo/autoapp.py
+            DATABASE_URL: postgresql://myUser:somePwd@localhost:5432/mydb
+            FLASK_DEBUG: 1
+            POSTGRES_USER: myUser
+            POSTGRES_DB: mydb
+            POSTGRES_PASSWORD: somePwd
+            POSTGRES_PORT: 5432
           
             
       - run:
@@ -71,15 +71,15 @@ jobs:
             sleep 1
             flask db migrate
             flask test
-        environment:
-          CONDUIT_SECRET: 'something-really-secret'
-          FLASK_APP: /home/circleci/repo/autoapp.py
-          DATABASE_URL: postgresql://myUser:somePwd@localhost:5432/mydb
-          FLASK_DEBUG: 1
-          POSTGRES_USER: myUser
-          POSTGRES_DB: mydb
-          POSTGRES_PASSWORD: somePwd
-          POSTGRES_PORT: 5432
+          environment:
+            CONDUIT_SECRET: 'something-really-secret'
+            FLASK_APP: /home/circleci/repo/autoapp.py
+            DATABASE_URL: postgresql://myUser:somePwd@localhost:5432/mydb
+            FLASK_DEBUG: 1
+            POSTGRES_USER: myUser
+            POSTGRES_DB: mydb
+            POSTGRES_PASSWORD: somePwd
+            POSTGRES_PORT: 5432
           
       - save_cache:
           paths:
