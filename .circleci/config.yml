@@ -99,8 +99,39 @@ jobs:
           name: heroku deploy
           command: |
             git push https://heroku:02467a97-3871-4afd-95ab-2b1a1c190165@git.heroku.com/warm-fortress-97103.git HEAD:main
+   
+   
+  build_docker:
+    environment:
+        IMAGE_NAME: etiamayedze/tp_devops_final_backend
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker image build --tag $IMAGE_NAME:app .
+      - run: docker save -o image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar 
             
-            
+  publish_image:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    steps:
+      - checkout
+      - attach_workspace:
+        at: /tmp/workspace
+      - setup_remote_docker
+      - run: docker load -i /tmp/workspace/image.tar
+      - run:
+          command:
+            echo "$DOCKERPASSWORD" | docker login --username etiamayedze --password-stdin
+            docker tag etiamayedze/docker-tp-ci:app etiamayedze/tp_devops_final_backend:$CIRCLE_BUILD_NUM
+            docker tag etiamayedze/docker-tp-ci:app etiamayedze/tp_devops_final_backend:latest
+            docker push etiamayedze/docker-tp-ci:latest
+            docker push etiamayedze/docker-tp-ci:$CIRCLE_BUILD_NUM
    
 
 #  docker-build-and-push:
@@ -138,4 +169,10 @@ workflows:
 #      - docker-build-and-push:
 #          context:
 #            - docker 
+      - build-docker
+      - publish_image:
+            context: 
+                - DOCKERPASSWORD
+            requires:
+                - build-docker
             
