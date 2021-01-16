@@ -172,7 +172,7 @@ workflows:
       - build_docker
       - publish_image:
             context: 
-                - DOCKERPASSWORD
+                - docker
             requires:
                 - build_docker
             
