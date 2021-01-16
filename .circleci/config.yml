@@ -133,7 +133,7 @@ jobs:
 #            docker tag etiamayedze/docker-tp-ci:app etiamayedze/tp_devops_final_backend:latest
 #            docker push etiamayedze/docker-tp-ci:latest
 #            docker push etiamayedze/docker-tp-ci:$CIRCLE_BUILD_NUM
-            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+            docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
             docker tag app $DOCKER_HUB_USER_ID/tp_devops_final_backend:$CIRCLE_BUILD_NUM
             docker tag app $DOCKER_HUB_USER_ID/tp_devops_final_backend:latest
             docker push $DOCKER_HUB_USER_ID/tp_devops_final_backend:$CIRCLE_BUILD_NUM
