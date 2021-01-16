@@ -97,5 +97,5 @@ workflows:
             - build
       - docker-build-and-push:
           context:
-            - DOCKER 
+            - docker 
             
