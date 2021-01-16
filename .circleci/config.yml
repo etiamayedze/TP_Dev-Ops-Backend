@@ -53,6 +53,8 @@ jobs:
           command: |
             . venv/bin/activate
             sleep 1
+            flask db init 
+            flask db migrate
             flask db upgrade
           environment:
             CONDUIT_SECRET: 'something-really-secret'
