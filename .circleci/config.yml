@@ -6,7 +6,10 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+          keys:
+            - v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
+            - v3-dependencies-
+
       - run:
           name: Install Python deps in a venv
           command: |
@@ -14,7 +17,10 @@ jobs:
             . venv/bin/activate
             pip install -r requirements/dev.txt
       - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+          keys:
+            - v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
+            - v3-dependencies-
+
           paths:
             - "venv"
 
@@ -23,30 +29,60 @@ jobs:
     docker:
       - image: circleci/python:latest
         environment:
-          DATABASE_URL: postgresql://ubuntu@localhost/circle_test?sslmode=disable
           CONDUIT_SECRET: 'something-really-secret'
-          FLASK_APP: autoapp.py
+          FLASK_APP: /home/circleci/repo/autoapp.py
+          DATABASE_URL: postgresql://myUser:somePwd@localhost:5432/mydb
           FLASK_DEBUG: 1
+          POSTGRES_USER: myUser
+          POSTGRES_DB: mydb
+          POSTGRES_PASSWORD: somePwd
+          POSTGRES_PORT: 5432
       - image: circleci/postgres:9.6.9-alpine
         environment:
-          POSTGRES_USER: ubuntu
-          POSTGRES_PASSWORD: circle_test
-          POSTGRES_BD: ""
+          POSTGRES_USER: myUser
+          POSTGRES_PASSWORD: somePwd
+          POSTGRES_BD: mydb
     steps:
       - checkout
       - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+          keys:
+            - v3-dependencies-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/prod.txt" }}
+            - v3-dependencies-
+
       - run:
           name: wait for postgres
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       
       - run:
-          name: Tests Flask
+        environment:
+          CONDUIT_SECRET: 'something-really-secret'
+          FLASK_APP: /home/circleci/repo/autoapp.py
+          DATABASE_URL: postgresql://myUser:somePwd@localhost:5432/mydb
+          FLASK_DEBUG: 1
+          POSTGRES_USER: myUser
+          POSTGRES_DB: mydb
+          POSTGRES_PASSWORD: somePwd
+          POSTGRES_PORT: 5432
+
+          name: flask upgrade
           command: |
             . venv/bin/activate
-            flask db stamp head
-            flask db migrate
+            sleep 1
             flask db upgrade
+      - run:
+        environment:
+          CONDUIT_SECRET: 'something-really-secret'
+          FLASK_APP: /home/circleci/repo/autoapp.py
+          DATABASE_URL: postgresql://myUser:somePwd@localhost:5432/mydb
+          FLASK_DEBUG: 1
+          POSTGRES_USER: myUser
+          POSTGRES_DB: mydb
+          POSTGRES_PASSWORD: somePwd
+          POSTGRES_PORT: 5432
+          name: flask test
+          command: |
+            . venv/bin/activate
+            sleep 1
             flask test
             
             
@@ -76,11 +112,11 @@ jobs:
       - deploy:
           name: Publish application to docker hub
           command: |
-            echo "$DOCKERPASSWORD" | docker login --username etiamayedze --password-stdin
-            docker tag etiamayedze/docker-tp-ci:app etiamayedze/docker-tp-final-devops-backend:$CIRCLE_BUILD_NUM
-            docker tag etiamayedze/docker-tp-ci:app etiamayedze/docker-tp-final-devops-backend:latest
-            docker push etiamayedze/docker-tp-final-devops-backend:latest
-            docker push etiamayedze/docker-tp-final-devops-backend:$CIRCLE_BUILD_NUM
+            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p 'DOCKERPASSWORD'
+            docker tag app $DOCKER_HUB_USER_ID/my-python-app:$CIRCLE_BUILD_NUM
+            docker tag app $DOCKER_HUB_USER_ID/my-python-app:latest
+            docker push $DOCKER_HUB_USER_ID/my-python-app:$CIRCLE_BUILD_NUM
+            docker push $DOCKER_HUB_USER_ID/my-python-app:latest
 
 
             
